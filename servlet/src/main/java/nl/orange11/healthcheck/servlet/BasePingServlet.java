@@ -23,9 +23,19 @@ import static nl.orange11.healthcheck.api.SystemStatus.OK;
  * <p>Abstract base class for your servlet exposing a ping executor. Based on the requested content type, the servlet
  * can return json or html. If you need json, provide <em>application/json</em> as the requested content type or add
  * <em>?type=json</em> to your request. In all other cases, html is returned.</p>
- * <p>Your implementation must provide the executor to expose.</p>
+ * <p>Your implementation must provide the executor to expose. And provide the init-param pinglevel if you need
+ * another level than the BASIC level for your ping. The following code block shows some example configuration to do that.</p>
+ * <pre>
+ * &lt;servlet&gt;
+ *     &lt;servlet-name&gt;PingServlet&lt;/servlet-name&gt;
+ *     &lt;servlet-class&gt;nl.orange11.healthcheck.example.ExampleServlet&lt;/servlet-class&gt;
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;pinglevel&lt;/param-name&gt;
+ *         &lt;param-value&gt;THOROUGH&lt;/param-value&gt;
+ *     &lt;/init-param&gt;
+ * &lt;/servlet&gt;
+ * </pre>
  * <p>The servlet contains a mechanism that only one request at a time is actually going to the backend.</p>
- * <p/>
  *
  * @author Jettro Coenradie
  */
@@ -48,6 +58,12 @@ public abstract class BasePingServlet extends HttpServlet {
      */
     protected abstract PingExecutor obtainExecutor(ServletConfig servletConfig);
 
+    /**
+     * Reeds the ping level and obtains the ping executor from the subclass.
+     *
+     * @param config ServletConfig used to read the init parameters from.
+     * @throws ServletException Exception thrown when interacting with ServletConfig
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);

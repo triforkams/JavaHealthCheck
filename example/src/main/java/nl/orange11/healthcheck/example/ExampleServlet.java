@@ -35,8 +35,10 @@ public class ExampleServlet extends BasePingServlet {
                         return new PingResult(getName(), SystemStatus.ERROR, "Always returns ERROR when calling the EXTENDED version");
                     case THOROUGH:
                         Map<String, String> items = new HashMap<String, String>();
-                        items.put("item1", "value1");
-                        return new ThoroughPingResult(getName(), SystemStatus.ERROR, "Now you have even more stuff ro read", items);
+                        items.put("item1", "value One");
+                        items.put("item2", "value Two");
+                        items.put("item3", "value Three");
+                        return new ThoroughPingResult(getName(), SystemStatus.OK, "Now you have even more stuff to read", items);
                 }
                 return new PingResult(getName(), SystemStatus.ERROR, "Unexpected PingLevel");
             }

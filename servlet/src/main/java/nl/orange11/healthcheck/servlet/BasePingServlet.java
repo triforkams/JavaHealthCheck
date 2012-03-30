@@ -21,12 +21,11 @@ import static nl.orange11.healthcheck.api.SystemStatus.OK;
 
 /**
  * <p>Abstract base class for your servlet exposing a ping executor. Based on the requested content type, the servlet
- * can return json or html. If you need json, provide <em>application/json</em> as the requested content type. In all
- * other cases, html is returned.</p>
+ * can return json or html. If you need json, provide <em>application/json</em> as the requested content type or add
+ * <em>?type=json</em> to your request. In all other cases, html is returned.</p>
  * <p>Your implementation must provide the executor to expose.</p>
  * <p>The servlet contains a mechanism that only one request at a time is actually going to the backend.</p>
  * <p/>
- * TODO : implement the json response
  *
  * @author Jettro Coenradie
  */
@@ -63,8 +62,11 @@ public abstract class BasePingServlet extends HttpServlet {
 
         int responseCode = obtainStatusOfResponse(pingResult);
         res.setStatus(responseCode);
-
-        writeHtmlToResponse(res, pingResult);
+        if ("application/json".equals(req.getHeader("Content-Type")) || "json".equals(req.getParameter("type"))) {
+            writeJsonResponse(res, pingResult);
+        } else {
+            writeHtmlToResponse(res, pingResult);
+        }
 
         closeHttpSession(req);
     }
@@ -99,7 +101,7 @@ public abstract class BasePingServlet extends HttpServlet {
     }
 
     /**
-     * Writes the PingResult as html back to the response object.
+     * Writes the PingResult as html back to the response object in html format.
      *
      * @param res        The HttpServletResponse object to write the html content to
      * @param pingResult PingResult containing the information to write to the response.
@@ -121,6 +123,39 @@ public abstract class BasePingServlet extends HttpServlet {
             writer.println("</tbody></table>");
         }
         writer.println("</body></html>");
+    }
+
+    /**
+     * Writes the results of the PingExecutor to the response object in JSON format.
+     *
+     * @param res        The HttpServletResponse object to write the json content to
+     * @param pingResult PingResult containing the information to write to the response.
+     * @throws IOException Thrown if writing to the response goed wrong
+     */
+    void writeJsonResponse(HttpServletResponse res, PingResult pingResult) throws IOException {
+        res.setContentType("application/json");
+        PrintWriter writer = res.getWriter();
+        StringBuilder sb = new StringBuilder();
+        sb.append("{")
+                .append("\"executorName\":\"").append(pingResult.getPingExecutorName()).append("\",")
+                .append("\"message\":\"").append(pingResult.getMessage()).append("\",");
+        if (pingResult instanceof ThoroughPingResult) {
+            sb.append("\"thoroughResults\" : {");
+            ThoroughPingResult thoroughPingResult = (ThoroughPingResult) pingResult;
+            Map<String, String> thoroughExtraValues = thoroughPingResult.getThoroughExtraValues();
+            boolean firstItem = true;
+            for (String key : thoroughExtraValues.keySet()) {
+                if (!firstItem) {
+                    sb.append(",");
+                } else {
+                    firstItem = false;
+                }
+                sb.append("\"").append(key).append("\":\"").append(thoroughExtraValues.get(key)).append("\"");
+            }
+            sb.append("}");
+        }
+        sb.append("}");
+        writer.println(sb.toString());
     }
 
     /**
@@ -166,10 +201,21 @@ public abstract class BasePingServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Checks if the provided string is not null nor empty.
+     *
+     * @param s String to check
+     * @return True if the string has content, false otherwise
+     */
     boolean isNotNullAndNotEmpty(String s) {
         return (s != null && s.length() != 0);
     }
 
+    /**
+     * Closes any available session.
+     *
+     * @param req HttpServletRequest to obtain the session from.
+     */
     void closeHttpSession(HttpServletRequest req) {
         if (req != null) {
             // close open session

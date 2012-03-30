@@ -14,9 +14,19 @@
         </init-param>
     </servlet>
 
+    <servlet>
+        <servlet-name>VersionServlet</servlet-name>
+        <servlet-class>nl.orange11.healthcheck.servlet.VersionServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>PingServlet</servlet-name>
         <url-pattern>/ping</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>VersionServlet</servlet-name>
+        <url-pattern>/version</url-pattern>
     </servlet-mapping>
 
 </web-app>

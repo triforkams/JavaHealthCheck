@@ -23,8 +23,13 @@ public class ExampleServlet extends BasePingServlet {
                 return new PingResult(getName(), SystemStatus.OK, "This is the demo executor, always returns OK is basic mode.");
             }
 
+            @Override
+            public PingResult executeExtended() {
+                return execute(PingLevel.EXTENDED);
+            }
+
             public ThoroughPingResult executeThorough() {
-                return null;
+                return new ThoroughPingResult(execute(PingLevel.THOROUGH), new HashMap<String, String>());
             }
 
             public PingResult execute(PingLevel pingLevel) {

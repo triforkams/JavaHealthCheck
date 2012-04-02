@@ -10,6 +10,10 @@ import java.util.Map;
 public class ThoroughPingResult extends PingResult {
     private Map<String, String> thoroughExtraValues;
 
+    public ThoroughPingResult(PingResult pingResult, Map<String, String> thoroughExtraValues) {
+        this(pingResult.getPingExecutorName(), pingResult.getSystemStatus(), pingResult.getMessage(), thoroughExtraValues);
+    }
+
     public ThoroughPingResult(String name, SystemStatus systemStatus, String message, Map<String, String> thoroughExtraValues) {
         super(name, systemStatus, message);
         this.thoroughExtraValues = thoroughExtraValues;

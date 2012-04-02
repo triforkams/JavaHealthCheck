@@ -29,6 +29,15 @@ public interface PingExecutor {
     PingResult execute();
 
     /**
+     * Executes the extended ping, usually this is a less light weight ping than the Basic ping. It is up to the
+     * implementation to adhere to this soft requirement. Check the documentation of the implementation to learn more
+     * about it.
+     *
+     * @return PingResult containing the System status and a short description
+     */
+    PingResult executeExtended();
+
+    /**
      * Executes the thorough ping, this ping returns the Thorough results containing more information about the system.
      *
      * @return ThoroughPingResult containing the data from the system as well as the basic ping results.

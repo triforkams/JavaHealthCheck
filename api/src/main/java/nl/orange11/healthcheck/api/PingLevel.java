@@ -6,7 +6,16 @@ package nl.orange11.healthcheck.api;
  * @author Jettro Coenradie
  */
 public enum PingLevel {
-    BASIC, // Lightweight ping
-    EXTENDED, // Can do a little more than Basic and is therefore heavier on the system
-    THOROUGH // Returns more information about the system and can therefore use more resources of the system
+    /**
+     * Lightweight ping
+     */
+    BASIC,
+    /**
+     * Can do a little more than Basic and is therefore heavier on the system
+     */
+    EXTENDED,
+    /**
+     * Returns more information about the system and can therefore use more resources of the system
+     */
+    THOROUGH
 }

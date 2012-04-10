@@ -154,9 +154,9 @@ public abstract class BasePingServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
         sb.append("{")
                 .append("\"executorName\":\"").append(pingResult.getPingExecutorName()).append("\",")
-                .append("\"message\":\"").append(pingResult.getMessage()).append("\",");
+                .append("\"message\":\"").append(pingResult.getMessage()).append("\"");
         if (pingResult instanceof ThoroughPingResult) {
-            sb.append("\"thoroughResults\" : {");
+            sb.append(",\"thoroughResults\" : {");
             ThoroughPingResult thoroughPingResult = (ThoroughPingResult) pingResult;
             Map<String, String> thoroughExtraValues = thoroughPingResult.getThoroughExtraValues();
             boolean firstItem = true;

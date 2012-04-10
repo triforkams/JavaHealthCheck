@@ -35,6 +35,10 @@ import static nl.orange11.healthcheck.api.SystemStatus.OK;
  *     &lt;/init-param&gt;
  * &lt;/servlet&gt;
  * </pre>
+ * <p>You can also provide the requested ping level in a request. This takes precedence over the servlet init param.
+ * Valid options are the text representations of the {@link PingLevel} items. Use the parameter
+ * <strong>{@value BasePingServlet#PARAM_PINGLEVEL}</strong> to provide your own value. You can also pass a number from
+ * 1 to and including 3 that we translate into the three levels of ping. 1 being Basic, 2 extended and 3 Thorough.</p>
  * <p>The servlet contains a mechanism that only one request at a time is actually going to the backend.</p>
  *
  * @author Jettro Coenradie
@@ -74,7 +78,10 @@ public abstract class BasePingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        PingResult pingResult = obtainPingResult(level);
+        String reqPingLevel = req.getParameter(PARAM_PINGLEVEL);
+        PingLevel pingLevel = obtainPingLevel(reqPingLevel, level);
+
+        PingResult pingResult = obtainPingResult(pingLevel);
 
         int responseCode = obtainStatusOfResponse(pingResult);
         res.setStatus(responseCode);
@@ -85,6 +92,34 @@ public abstract class BasePingServlet extends HttpServlet {
         }
 
         closeHttpSession(req);
+    }
+
+    /**
+     * Returns the PingLevel that belongs to the requestedPingLevel. If the requested ping level does not result in a
+     * valid PingLevel, we return the provided defaultLevel. You can provide the name of the item in the enum PingLevel
+     * or a number representing the items in the order of the enum. The enum consists of three items, therefore the
+     * numeric value can be 1, 2 or 3.
+     *
+     * @param requestedPingLevel String representation of the PingLevel.
+     * @param defaultLevel       Default PingLevel to return in case problems
+     * @return PingLevel found for the provided requestedPingLevel or the provided defaultPingLevel
+     */
+    PingLevel obtainPingLevel(String requestedPingLevel, PingLevel defaultLevel) {
+        if (requestedPingLevel == null || "".equals(requestedPingLevel)) {
+            return defaultLevel;
+        }
+
+        PingLevel pingLevel;
+        if (requestedPingLevel.matches("[1-3]")) {
+            pingLevel = PingLevel.values()[Integer.parseInt(requestedPingLevel) - 1];
+        } else {
+            try {
+                pingLevel = PingLevel.valueOf(requestedPingLevel);
+            } catch (IllegalArgumentException e) {
+                pingLevel = defaultLevel;
+            }
+        }
+        return pingLevel;
     }
 
     /*

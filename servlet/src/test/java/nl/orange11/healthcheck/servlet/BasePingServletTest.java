@@ -1,6 +1,7 @@
 package nl.orange11.healthcheck.servlet;
 
 import nl.orange11.healthcheck.api.PingExecutor;
+import nl.orange11.healthcheck.api.PingLevel;
 import nl.orange11.healthcheck.api.PingResult;
 import nl.orange11.healthcheck.api.SystemStatus;
 import org.junit.Before;
@@ -46,6 +47,25 @@ public class BasePingServletTest {
         when(mockServletContext.getInitParameter("pinglevel")).thenReturn(null);
 
         basePingServlet.init(mockServletConfig);
+    }
+
+    @Test
+    public void testObtainPingLevel() throws Exception {
+        verifyObtainPingLevel("1", PingLevel.BASIC);
+        verifyObtainPingLevel("2", PingLevel.EXTENDED);
+        verifyObtainPingLevel("3", PingLevel.THOROUGH);
+        verifyObtainPingLevel("4", PingLevel.EXTENDED);
+        verifyObtainPingLevel("a", PingLevel.EXTENDED);
+        verifyObtainPingLevel(PingLevel.BASIC.toString(), PingLevel.BASIC);
+        verifyObtainPingLevel(PingLevel.EXTENDED.toString(), PingLevel.EXTENDED);
+        verifyObtainPingLevel(PingLevel.THOROUGH.toString(), PingLevel.THOROUGH);
+        verifyObtainPingLevel(null, PingLevel.EXTENDED);
+        verifyObtainPingLevel("", PingLevel.EXTENDED);
+    }
+
+    private void verifyObtainPingLevel(String level, PingLevel expected) {
+        PingLevel pingLevel = basePingServlet.obtainPingLevel(level, PingLevel.EXTENDED);
+        assertEquals(expected, pingLevel);
     }
 
     @Test

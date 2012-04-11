@@ -4,7 +4,7 @@
     <parent>
         <groupId>nl.orange11.healthcheck</groupId>
         <artifactId>orange11-health-check</artifactId>
-        <version>0.2.2</version>
+        <version>0.2.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>orange11-healthcheck-api</artifactId>

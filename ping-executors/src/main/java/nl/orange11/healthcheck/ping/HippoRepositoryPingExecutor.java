@@ -19,6 +19,8 @@ import java.util.HashMap;
  * <li>Thorough - The same as the extended check.</li>
  * </ul>
  * <p>A special builder is available {@link HippoRepositoryPingExecutorBuilder} to make creating the executor easier.</p>
+ * <p>The ping executor provides a number of configuration parameters. Most of them are self explanatory. An important
+ * one is the customMessage. If you provide a custom message, the status of the returned ping is MAINTENANCE.</p>
  * <p>A lot of the code is based on the PingServlet as provided by Hippo.</p>
  *
  * @author Jettro Coenradie
@@ -50,16 +52,19 @@ public class HippoRepositoryPingExecutor implements PingExecutor {
 
     @Override
     public PingResult execute() {
+        logger.debug("Execute the basic ping.");
         return execute(PingLevel.BASIC);
     }
 
     @Override
     public PingResult executeExtended() {
+        logger.debug("Execute the extended ping.");
         return execute(PingLevel.EXTENDED);
     }
 
     @Override
     public ThoroughPingResult executeThorough() {
+        logger.debug("Execute the thorough ping.");
         PingResult pingResult = execute(PingLevel.THOROUGH);
         return new ThoroughPingResult(pingResult.getPingExecutorName(), pingResult.getSystemStatus(), pingResult.getMessage(),
                 new HashMap<String, String>());
@@ -70,11 +75,13 @@ public class HippoRepositoryPingExecutor implements PingExecutor {
         SystemStatus status = SystemStatus.OK;
         String resultMessage = "OK - Repository online and accessible.";
         if (hasCustomMessage()) {
+            logger.info("Returning the default message for the ping: " + customMessage);
             resultMessage = customMessage;
-            status = SystemStatus.TIMEOUT_ERROR;
+            status = SystemStatus.MAINTENANCE;
         } else {
             try {
                 doRepositoryChecks(pingLevel);
+                logger.debug("Ping executed is fine.");
             } catch (HippoPingException e) {
                 status = e.getProposedStatus();
                 resultMessage = e.getMessage();

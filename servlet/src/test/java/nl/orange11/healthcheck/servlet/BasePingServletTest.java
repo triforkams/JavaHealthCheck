@@ -74,6 +74,7 @@ public class BasePingServletTest {
         verifyStatus(500, SystemStatus.ERROR);
         verifyStatus(401, SystemStatus.AUTHENTICATION_ERROR);
         verifyStatus(503, SystemStatus.TIMEOUT_ERROR);
+        verifyStatus(503, SystemStatus.MAINTENANCE);
     }
 
     private void verifyStatus(int expected, SystemStatus status) {

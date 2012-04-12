@@ -56,11 +56,13 @@ public abstract class BasePingServlet extends HttpServlet {
 
     /**
      * Returns the {@link PingExecutor} to execute. The ServletConfig is provided to the subclass to be able to obtain
-     * variables that are required to configure the PingExecutor.
+     * variables that are required to configure the PingExecutor. When we cannot obtain the executor in the right state
+     * a ServletException is thrown.
      *
      * @return The PingExecutor to execute
+     * @throws ServletException when an errors occurs obtaining the executor this exception is thrown.
      */
-    protected abstract PingExecutor obtainExecutor(ServletConfig servletConfig);
+    protected abstract PingExecutor obtainExecutor(ServletConfig servletConfig) throws ServletException;
 
     /**
      * Reeds the ping level and obtains the ping executor from the subclass.
@@ -145,6 +147,9 @@ public abstract class BasePingServlet extends HttpServlet {
                 responseCode = HttpServletResponse.SC_UNAUTHORIZED;
                 break;
             case TIMEOUT_ERROR:
+                responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
+                break;
+            case MAINTENANCE:
                 responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE;
                 break;
         }

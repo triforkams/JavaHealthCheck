@@ -127,7 +127,7 @@ public class HippoRepositoryPingExecutorTest {
         PingResult pingResult = spyExecutor.execute();
 
         assertNotNull(pingResult);
-        assertEquals(SystemStatus.TIMEOUT_ERROR, pingResult.getSystemStatus());
+        assertEquals(SystemStatus.MAINTENANCE, pingResult.getSystemStatus());
         assertEquals("Custom message for maintenance mode.", pingResult.getMessage());
     }
 

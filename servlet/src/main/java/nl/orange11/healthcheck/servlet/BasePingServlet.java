@@ -116,7 +116,7 @@ public abstract class BasePingServlet extends HttpServlet {
             pingLevel = PingLevel.values()[Integer.parseInt(requestedPingLevel) - 1];
         } else {
             try {
-                pingLevel = PingLevel.valueOf(requestedPingLevel);
+                pingLevel = PingLevel.valueOf(requestedPingLevel.toUpperCase());
             } catch (IllegalArgumentException e) {
                 pingLevel = defaultLevel;
             }

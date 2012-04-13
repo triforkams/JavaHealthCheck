@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.*;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>Implementation for the {@link PingExecutor} that connects to a hippo repository. The PingExecutor interface specifies
@@ -16,7 +17,7 @@ import java.util.HashMap;
  * <ul>
  * <li>Basic - Tries to connect to a repository by reading a node.</li>
  * <li>Extended - Tries to connect to a repository by reading from a node and writing to a node.</li>
- * <li>Thorough - The same as the extended check.</li>
+ * <li>Thorough - The same as the extended check plus it adds information about memory consumption to the result.</li>
  * </ul>
  * <p>A special builder is available {@link HippoRepositoryPingExecutorBuilder} to make creating the executor easier.</p>
  * <p>The ping executor provides a number of configuration parameters. Most of them are self explanatory. An important
@@ -94,7 +95,11 @@ public class HippoRepositoryPingExecutor implements PingExecutor {
             }
 
         }
-        return new PingResult(getName(), status, resultMessage);
+        PingResult pingResult = new PingResult(getName(), status, resultMessage);
+        if (pingLevel == PingLevel.THOROUGH) {
+            pingResult = obtainAdditionalInformationThoroughPing(pingResult);
+        }
+        return pingResult;
     }
 
     /**
@@ -195,6 +200,19 @@ public class HippoRepositoryPingExecutor implements PingExecutor {
             String msg = "FAILURE - Error during write test. There could be an issue with the (connection to) the storage.";
             throw new HippoPingException(msg, e, SystemStatus.ERROR);
         }
+    }
+
+    private PingResult obtainAdditionalInformationThoroughPing(PingResult pingResult) {
+        Map<String, String> thoroughExtraValues = new HashMap<String, String>();
+        int megaBytes = 1024 * 1024;
+        Runtime runtime = Runtime.getRuntime();
+        thoroughExtraValues.put("used_memory", String.valueOf((runtime.totalMemory() - runtime.freeMemory()) / megaBytes) + " Mb");
+        thoroughExtraValues.put("free_memory", String.valueOf(runtime.freeMemory() / megaBytes) + " Mb");
+        thoroughExtraValues.put("total_memory", String.valueOf(runtime.totalMemory() / megaBytes) + " Mb");
+        thoroughExtraValues.put("max_memory", String.valueOf(runtime.maxMemory() / megaBytes) + " Mb");
+
+        pingResult = new ThoroughPingResult(pingResult, thoroughExtraValues);
+        return pingResult;
     }
 
     private boolean hasCustomMessage() {

@@ -4,7 +4,7 @@
 
     <groupId>nl.orange11.healthcheck</groupId>
     <artifactId>orange11-health-check</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 

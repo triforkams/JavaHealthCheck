@@ -210,6 +210,7 @@ public class HippoRepositoryPingExecutor implements PingExecutor {
         thoroughExtraValues.put("free_memory", String.valueOf(runtime.freeMemory() / megaBytes) + " Mb");
         thoroughExtraValues.put("total_memory", String.valueOf(runtime.totalMemory() / megaBytes) + " Mb");
         thoroughExtraValues.put("max_memory", String.valueOf(runtime.maxMemory() / megaBytes) + " Mb");
+        thoroughExtraValues.put("number_of_processors", String.valueOf(runtime.availableProcessors()));
 
         pingResult = new ThoroughPingResult(pingResult, thoroughExtraValues);
         return pingResult;

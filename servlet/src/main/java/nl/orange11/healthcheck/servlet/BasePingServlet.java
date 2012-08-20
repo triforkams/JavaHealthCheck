@@ -4,6 +4,8 @@ import nl.orange11.healthcheck.api.PingExecutor;
 import nl.orange11.healthcheck.api.PingLevel;
 import nl.orange11.healthcheck.api.PingResult;
 import nl.orange11.healthcheck.api.ThoroughPingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -44,8 +46,10 @@ import static nl.orange11.healthcheck.api.SystemStatus.OK;
  * @author Jettro Coenradie
  */
 public abstract class BasePingServlet extends HttpServlet {
-    private static final String PARAM_PINGLEVEL = "pinglevel";
-    private static final PingLevel DEFAULT_LEVEL = PingLevel.BASIC;
+    private static final Logger logger = LoggerFactory.getLogger(BasePingServlet.class);
+
+    static final String PARAM_PINGLEVEL = "pinglevel";
+    static final PingLevel DEFAULT_LEVEL = PingLevel.BASIC;
 
     private PingExecutor pingExecutor;
     private PingLevel level;
@@ -83,6 +87,8 @@ public abstract class BasePingServlet extends HttpServlet {
         String reqPingLevel = req.getParameter(PARAM_PINGLEVEL);
         PingLevel pingLevel = obtainPingLevel(reqPingLevel, level);
 
+        logger.debug("Receiving a request for a ping with level {}", pingLevel.name());
+
         PingResult pingResult = obtainPingResult(pingLevel);
 
         int responseCode = obtainStatusOfResponse(pingResult);
@@ -106,7 +112,7 @@ public abstract class BasePingServlet extends HttpServlet {
      * @param defaultLevel       Default PingLevel to return in case problems
      * @return PingLevel found for the provided requestedPingLevel or the provided defaultPingLevel
      */
-    PingLevel obtainPingLevel(String requestedPingLevel, PingLevel defaultLevel) {
+    protected PingLevel obtainPingLevel(String requestedPingLevel, PingLevel defaultLevel) {
         if (requestedPingLevel == null || "".equals(requestedPingLevel)) {
             return defaultLevel;
         }
@@ -134,7 +140,7 @@ public abstract class BasePingServlet extends HttpServlet {
      * @param pingResult The obtained ping result that contains the information to determine the response code
      * @return int representing the HttpServletResponse code
      */
-    int obtainStatusOfResponse(PingResult pingResult) {
+    protected int obtainStatusOfResponse(PingResult pingResult) {
         int responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         switch (pingResult.getSystemStatus()) {
             case OK:
@@ -163,7 +169,7 @@ public abstract class BasePingServlet extends HttpServlet {
      * @param pingResult PingResult containing the information to write to the response.
      * @throws IOException Thrown if writing to the response goes wrong.
      */
-    void writeHtmlToResponse(HttpServletResponse res, PingResult pingResult) throws IOException {
+    protected void writeHtmlToResponse(HttpServletResponse res, PingResult pingResult) throws IOException {
         res.setContentType("text/html");
         PrintWriter writer = res.getWriter();
         writer.println("<html><head><title>Ping Result</title></head><body><h1>Ping Result</h1>");
@@ -188,7 +194,7 @@ public abstract class BasePingServlet extends HttpServlet {
      * @param pingResult PingResult containing the information to write to the response.
      * @throws IOException Thrown if writing to the response goed wrong
      */
-    void writeJsonResponse(HttpServletResponse res, PingResult pingResult) throws IOException {
+    protected void writeJsonResponse(HttpServletResponse res, PingResult pingResult) throws IOException {
         res.setContentType("application/json");
         PrintWriter writer = res.getWriter();
         StringBuilder sb = new StringBuilder();
@@ -220,10 +226,11 @@ public abstract class BasePingServlet extends HttpServlet {
      *
      * @return PingResult as obtained using the ping executor
      */
-    PingResult obtainPingResult(PingLevel level) {
+    protected PingResult obtainPingResult(PingLevel level) {
         PingResult result;
         if (pingResultSemaphore.tryAcquire()) {
             try {
+                logger.debug("About to execute a real ping to the backend with level {}", level.name());
                 result = pingExecutor.execute(level);
                 if (result != null) {
                     pingResultReference.set(result);
@@ -231,6 +238,8 @@ public abstract class BasePingServlet extends HttpServlet {
             } finally {
                 pingResultSemaphore.release();
             }
+        } else {
+            logger.debug("returning the previous message of ping since a new ping is being executed");
         }
         return pingResultReference.get();
     }
@@ -244,7 +253,7 @@ public abstract class BasePingServlet extends HttpServlet {
      * @param defaultValue The default value for the parameter. If no value could be found, this value is used.
      * @return String containing the value for the provided parameter.
      */
-    String getParameter(ServletConfig config, String paramName, String defaultValue) {
+    protected String getParameter(ServletConfig config, String paramName, String defaultValue) {
         String initValue = config.getInitParameter(paramName);
         String contextValue = config.getServletContext().getInitParameter(paramName);
 

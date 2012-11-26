@@ -2,12 +2,12 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-    <display-name>Orange11 Health check Example</display-name>
-    <description>Orange11 Health check Example ~ showing what you can do with the health check</description>
+    <display-name>Trifork Health check Example</display-name>
+    <description>Trifork Health check Example ~ showing what you can do with the health check</description>
 
     <servlet>
         <servlet-name>PingServlet</servlet-name>
-        <servlet-class>nl.orange11.healthcheck.example.ExampleServlet</servlet-class>
+        <servlet-class>nl.trifork.healthcheck.example.ExampleServlet</servlet-class>
         <init-param>
             <param-name>pinglevel</param-name>
             <param-value>THOROUGH</param-value>
@@ -16,7 +16,7 @@
 
     <servlet>
         <servlet-name>VersionServlet</servlet-name>
-        <servlet-class>nl.orange11.healthcheck.servlet.VersionServlet</servlet-class>
+        <servlet-class>nl.trifork.healthcheck.servlet.VersionServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

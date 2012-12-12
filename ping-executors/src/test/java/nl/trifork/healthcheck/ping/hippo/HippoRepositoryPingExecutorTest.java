@@ -1,9 +1,12 @@
-package nl.trifork.healthcheck.ping;
+package nl.trifork.healthcheck.ping.hippo;
 
 import nl.trifork.healthcheck.api.PingLevel;
 import nl.trifork.healthcheck.api.PingResult;
 import nl.trifork.healthcheck.api.SystemStatus;
 import nl.trifork.healthcheck.api.ThoroughPingResult;
+import nl.trifork.healthcheck.ping.hippo.HippoPingException;
+import nl.trifork.healthcheck.ping.hippo.HippoRepositoryPingExecutor;
+import nl.trifork.healthcheck.ping.hippo.HippoRepositoryPingExecutorBuilder;
 import org.hippoecm.repository.HippoRepository;
 import org.junit.Before;
 import org.junit.Test;

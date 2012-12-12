@@ -1,4 +1,4 @@
-package nl.trifork.healthcheck.ping;
+package nl.trifork.healthcheck.ping.hippo;
 
 import nl.trifork.healthcheck.api.SystemStatus;
 

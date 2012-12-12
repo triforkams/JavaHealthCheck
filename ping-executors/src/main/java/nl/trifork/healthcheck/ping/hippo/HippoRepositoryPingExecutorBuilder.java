@@ -1,4 +1,4 @@
-package nl.trifork.healthcheck.ping;
+package nl.trifork.healthcheck.ping.hippo;
 
 /**
  * <p>Special builder class to create a {@link HippoRepositoryPingExecutor}. The builder contains a number of default
